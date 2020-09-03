@@ -149,6 +149,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
+
+        if current_node:
+            while current_node:
+                if current_node.key == key:
+                    return current_node.value
+                current_node = current_node.next
+            return None
+        else:
+            return None
         
 
     def resize(self, new_capacity):
