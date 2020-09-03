@@ -22,6 +22,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity # Number of buckets in the hash table
+        self.data = [None]  * capacity
+        self.entries = 0
 
 
     def get_num_slots(self):
@@ -35,7 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return len(self.data)
 
     def get_load_factor(self):
         """
@@ -44,7 +47,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        filled_spots = 0
+        for each_spot in self.data:
+            if each_spot != None:
+                filled_spots += 1
+        return filled_spots / self.capacity
 
     def fnv1(self, key):
         """
