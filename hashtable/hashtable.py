@@ -93,7 +93,22 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if (self.get_load_factor() / self.capacity) >= 0.7:
+            self.resize()
 
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
+
+        while current_node:
+            if current_node.key == key:
+                current_node.value = value
+                return
+            elif current_node.next:
+                current_node = current_node.next
+            else:
+                current_node.next = HashTableEntry(key, value)
+                return
+        self.data[slot] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -104,7 +119,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if (self.get_load_factor() / self.capacity) <= 0.2:
+            self.resize(0.5)
 
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
+
+
+        if current_node:
+            if current_node.key == key:
+                self.data[slot] = current_node.next
+                return
+
+            while current_node.next:
+                prev_node = current_node
+                current_node = current_node.next
+                if current_node.key == key:
+                    prev_node.next = current_node.next
+                    return
+
+        return None
 
     def get(self, key):
         """
@@ -115,7 +149,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        
 
     def resize(self, new_capacity):
         """
@@ -125,7 +159,21 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if new_capacity == 2:
+            self.capacity = self.capacity * 2
+        elif new_capacity == 0.5:
+            self.capacity = self.capacity // 2
+        else:
+            self.capacity = new_capacity
 
+
+        old_data = self.data
+        self.data = [None] * self.capacity
+
+        for node in old_data:
+            while node:
+                self.put(node.key, node.value)
+                node = node.next
 
 
 if __name__ == "__main__":
