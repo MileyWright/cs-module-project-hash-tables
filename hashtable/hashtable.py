@@ -61,7 +61,7 @@ class HashTable:
         """
 
         # Your code here
-
+        pass
 
     def djb2(self, key):
         """
@@ -70,6 +70,10 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def hash_index(self, key):
