@@ -20,11 +20,14 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
+    def __init__(self, capacity): # Initialize
         # Your code here
+        self.capacity = capacity # Number of buckets in the hash table
+        self.data = [None]  * capacity
+        self.entries = 0
 
 
-    def get_num_slots(self):
+    def get_num_slots(self): # Get num of slots
         """
         Return the length of the list you're using to hold the hash
         table data. (Not the number of items stored in the hash table,
@@ -35,16 +38,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.data)
 
-
-    def get_load_factor(self):
+    def get_load_factor(self): # Get load factor 
         """
         Return the load factor for this hash table.
 
         Implement this.
         """
         # Your code here
-
+        filled_spots = 0                        # set filled spots to 0
+        for each_spot in self.data:             # for each spot in the data
+            if each_spot != None:               # if spot is not equal to none
+                filled_spots += 1               # filled spots = filled spots + 1
+        return filled_spots / self.capacity     # return spots / capacity
 
     def fnv1(self, key):
         """
@@ -54,15 +61,19 @@ class HashTable:
         """
 
         # Your code here
+        pass
 
-
-    def djb2(self, key):
+    def djb2(self, key): #DJB2 Hash Function
         """
         DJB2 hash, 32-bit
 
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash = 5381                         # the value used by the djb2 hash function
+        for c in key:                       # contains the ascil value of each char in the string
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def hash_index(self, key):
@@ -73,7 +84,7 @@ class HashTable:
         #return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
-    def put(self, key, value):
+    def put(self, key, value): # Edit / Update
         """
         Store the value with the given key.
 
@@ -82,9 +93,24 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if (self.get_load_factor() / self.capacity) >= 0.7:     # if load factor / capacity >= 0.7
+            self.resize()                                       # resize
 
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
 
-    def delete(self, key):
+        while current_node:
+            if current_node.key == key:         # if key matches
+                current_node.value = value      # if value matches
+                return                          # return
+            elif current_node.next:
+                current_node = current_node.next
+            else:
+                current_node.next = HashTableEntry(key, value)
+                return
+        self.data[slot] = HashTableEntry(key, value)
+
+    def delete(self, key): # Delete
         """
         Remove the value stored with the given key.
 
@@ -93,9 +119,28 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if (self.get_load_factor() / self.capacity) <= 0.2:     # if load factor / capacity <= 0.2
+            self.resize(0.5)                                    # resize
+
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
 
 
-    def get(self, key):
+        if current_node:
+            if current_node.key == key:
+                self.data[slot] = current_node.next
+                return
+
+            while current_node.next:
+                prev_node = current_node                        # prev node is now the current node
+                current_node = current_node.next                # current node is now the next node
+                if current_node.key == key:
+                    prev_node.next = current_node.next
+                    return
+
+        return None
+
+    def get(self, key): # Get
         """
         Retrieve the value stored with the given key.
 
@@ -104,9 +149,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        slot = self.hash_index(key)
+        current_node = self.data[slot]
 
+        if current_node:
+            while current_node:
+                if current_node.key == key:
+                    return current_node.value
+                current_node = current_node.next
+            return None
+        else:
+            return None
+        
 
-    def resize(self, new_capacity):
+    def resize(self, new_capacity): # Resize
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
@@ -114,7 +170,21 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if new_capacity == 2:
+            self.capacity = self.capacity * 2
+        elif new_capacity == 0.5:
+            self.capacity = self.capacity // 2
+        else:
+            self.capacity = new_capacity
 
+
+        old_data = self.data
+        self.data = [None] * self.capacity
+
+        for node in old_data:
+            while node:
+                self.put(node.key, node.value)
+                node = node.next
 
 
 if __name__ == "__main__":
